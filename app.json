@@ -1,7 +1,7 @@
 {
   "expo": {
-    "name": "manmoto",
-    "slug": "manmoto",
+    "name": "DashDriver",
+    "slug": "DashDriver",
     "version": "1.0.0",
     "orientation": "portrait",
     "icon": "./assets/icon.png",
