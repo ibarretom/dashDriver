@@ -1,4 +1,4 @@
-import { StyleSheet, View, Text, Keyboard, TouchableWithoutFeedback } from "react-native";
+import { StyleSheet, View, Text, Keyboard, TouchableWithoutFeedback, Alert } from "react-native";
 
 import { AppTextInput } from "../components/inputs/AppTextInput";
 import { AppButton } from "../components/buttons/AppButton";
@@ -35,7 +35,7 @@ export function Login({ navigation }) {
       await signIn({ email, password })
       setIsLoading(false)
     } catch (err) {
-      console.warn(err.message)
+      Alert.alert('Erro ao fazer login', 'Confira se usuário e senha estão corretos')
     }
   }
 
