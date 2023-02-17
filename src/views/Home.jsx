@@ -12,10 +12,14 @@ import { months } from "../utils/months"
 
 import { useRevenue } from "../hooks/revenue"
 import { useCarInfo } from "../hooks/carInfo"
+import { auth, signOut } from "../plugins/firebase";
+import { useNavigationState } from "@react-navigation/native";
 
 export function Home({ navigation }) {
+  // signOut(auth)
   const { getRevenue, getTotalRevenue } = useRevenue()
   const { getCarInfo } = useCarInfo()
+  const state = useNavigationState(state => state);
 
   const [resumeMonth, setResumeMonth] = useState(months[new Date().getMonth()].label)
   const [revenue, setRevenue] = useState({
@@ -49,7 +53,7 @@ export function Home({ navigation }) {
     getCarInfo(resumeMonth)
       .then(d => setCarInfo(d))
       .catch(e => console.log('home', e.message))
-  }, [resumeMonth])
+  }, [resumeMonth, state])
 
   useEffect(() => {
     setTotalRevenue(getTotalRevenue(revenue))
