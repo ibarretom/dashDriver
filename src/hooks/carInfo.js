@@ -17,13 +17,13 @@ export function useCarInfo() {
     }
     const real = { amount: 0 }
 
-    kilometers.forEach(k => {
-      if (k.register_moment === 'inicio') {
-        carInfo.kilometers -= k.kilometers
-      }
+    const filteredKilometers = kilometers.filter(k => k.register_moment === 'inicio')
 
-      if (k.register_moment === 'fim') {
-        carInfo.kilometers += k.kilometers
+    filteredKilometers.forEach(km => {
+      const endKilometers = kilometers.find(k => (k.date.date_string === km.date.date_string && k.register_moment === 'fim'))
+
+      if(endKilometers) {
+        carInfo.kilometers += endKilometers.kilometers - km.kilometers
       }
     })
 
