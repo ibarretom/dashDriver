@@ -12,11 +12,9 @@ import { months } from "../utils/months"
 
 import { useRevenue } from "../hooks/revenue"
 import { useCarInfo } from "../hooks/carInfo"
-import { auth, signOut } from "../plugins/firebase";
 import { useNavigationState } from "@react-navigation/native";
 
 export function Home({ navigation }) {
-  // signOut(auth)
   const { getRevenue, getTotalRevenue } = useRevenue()
   const { getCarInfo } = useCarInfo()
   const state = useNavigationState(state => state);
