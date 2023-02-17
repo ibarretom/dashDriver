@@ -13,10 +13,7 @@ import { months } from "../utils/months"
 import { useRevenue } from "../hooks/revenue"
 import { useCarInfo } from "../hooks/carInfo"
 
-import { auth, signOut } from "../plugins/firebase"
-
 export function Home({ navigation }) {
-  signOut(auth)
   const { getRevenue, getTotalRevenue } = useRevenue()
   const { getCarInfo } = useCarInfo()
 
