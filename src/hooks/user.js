@@ -7,7 +7,14 @@ export function useUser() {
     })
   }
 
+  async function updateUserProfilePhoto(photoURL) {
+    return updateProfile(auth.currentUser, {
+      photoURL: photoURL
+    })
+  }
+
   return {
-    updateUserName
+    updateUserName,
+    updateUserProfilePhoto
   }
 }

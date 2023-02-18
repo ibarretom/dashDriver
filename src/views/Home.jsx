@@ -1,5 +1,5 @@
 import { useEffect, useState } from "react";
-import { ScrollView, StyleSheet, Text, View } from "react-native"
+import { ActivityIndicator, ScrollView, StyleSheet, Text, View } from "react-native"
 
 import { AppSquareWithIconButton } from "../components/buttons/AppSquareWithIconButton"
 import { AppPicker } from "../components/inputs/AppPicker"
@@ -43,6 +43,7 @@ export function Home({ navigation }) {
     kilometersPerLitters: 0,
     realsPerLiter: 0
   })
+  const [loadingScreen, setLoadingScreen] = useState(false)
 
   useEffect(() => {
     getRevenue(resumeMonth)
@@ -68,7 +69,7 @@ export function Home({ navigation }) {
     <ScrollView style={styles.mainContainer}>
       <>
         <View style={styles.welcomeContainer}>
-          <Picture />
+          <Picture setLoadingScreen={setLoadingScreen} userImage={user?.photoURL}/>
           <View style={styles.welcomeTextContainer}>
             <Text style={styles.welcomeText}>Bem-vindo, {user?.displayName}</Text>
             <Text>{`${new Date().getDate()} de ${months[new Date().getMonth()].label} de ${new Date().getFullYear()}`} </Text>
@@ -128,6 +129,18 @@ export function Home({ navigation }) {
         </View>
 
         <View style={[styles.emptyspace]}></View>
+
+        {
+          loadingScreen &&
+          <View
+            style={[
+              StyleSheet.absoluteFill,
+              styles.uploadingOverlay
+            ]}
+          >
+            <ActivityIndicator color='#fff' animating size='large' />
+          </View>
+        }
       </>
     </ScrollView>
   )
@@ -164,5 +177,10 @@ const styles = StyleSheet.create({
   },
   emptyspace: {
     marginBottom: 52
+  },
+  uploadingOverlay: {
+    backgroundColor: 'rgba(0,0,0,0.4)',
+    alignItems: 'center',
+    justifyContent: 'center',
   },
 })
