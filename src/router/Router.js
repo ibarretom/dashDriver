@@ -11,6 +11,7 @@ import { Spent } from '../views/Spent';
 import { Kilometers } from '../views/Kilometers';
 
 import { useAuth } from "../hooks/auth";
+import { TabNavigator } from "./TabNavigator.routes";
 
 const theme = {
   ...DefaultTheme,
@@ -36,7 +37,7 @@ export function Router() {
             <Stack.Screen name="Register" component={Register} />
           </> :
           <>
-            <Stack.Screen name="Home" component={Home} />
+            <Stack.Screen name="TabNavigator" component={TabNavigator} />
             <Stack.Screen name="CarRide" component={CarRide} />
             <Stack.Screen name="Fuel" component={Fuel} />
             <Stack.Screen name="Earning" component={Earning} />
