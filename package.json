@@ -29,7 +29,8 @@
     "react-native-uuid": "^2.0.1",
     "react-native-vector-icons": "^9.2.0",
     "victory-native": "^36.6.8",
-    "yup": "^1.0.0"
+    "yup": "^1.0.0",
+    "expo-dev-client": "~2.0.1"
   },
   "devDependencies": {
     "@babel/core": "^7.12.9"
