@@ -33,9 +33,10 @@ export function Login({ navigation }) {
     setIsLoading(true)
     try {
       await signIn({ email, password })
-      setIsLoading(false)
     } catch (err) {
       Alert.alert('Erro ao fazer login', 'Confira se usuário e senha estão corretos')
+    } finally {
+      setIsLoading(false)
     }
   }
 
