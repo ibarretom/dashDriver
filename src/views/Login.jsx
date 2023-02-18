@@ -78,7 +78,7 @@ export function Login({ navigation }) {
         <View style={{ marginTop: 16 }}>
           <AppButton
             title={'Entrar'}
-            color={'#1E232C'}
+            color={'#0E6ECE'}
             isLoading={isLoading}
             onPress={handleSubmit(handleLogin)}
           />

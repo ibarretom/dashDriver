@@ -122,7 +122,7 @@ export function Register({ navigation }) {
         <View style={{ marginTop: 16 }}>
           <AppButton
             title={'Registrar-se'}
-            color={'#1E232C'}
+            color={'#0E6ECE'}
             isLoading={isLoading}
             onPress={handleSubmit(handleRegister)}
           />
