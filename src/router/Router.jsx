@@ -23,13 +23,14 @@ const theme = {
 const Stack = createNativeStackNavigator();
 
 export function Router() {
-  const { isLogIn } = useAuth()
+  const { isLoggedIn } = useAuth()
+
   return (
     <NavigationContainer theme={theme}>
       <Stack.Navigator
         screenOptions={{ animation: "none", headerShown: false }}
       >
-        { !isLogIn ?
+        { !isLoggedIn ?
           <>
             <Stack.Screen name="Login" component={Login} />
             <Stack.Screen name="Register" component={Register} />

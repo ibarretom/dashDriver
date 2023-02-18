@@ -10,6 +10,7 @@ import * as yup from "yup"
 
 import { useAuth } from "../hooks/auth"
 import { useState } from "react";
+import { useUser } from "../hooks/user"
 
 const registerSchema = yup.object({
   name: yup.string().required('Digite o nome'),
@@ -22,7 +23,8 @@ const registerSchema = yup.object({
 })
 
 export function Register({ navigation }) {
-  const { createUser, updateUserName } = useAuth()
+  const { updateUserName } = useUser()
+  const { createUser } = useAuth()
 
   const [isLoading, setIsLoading] = useState()
   const [errorCreatingUser, setErrorCreatingUser] = useState()
@@ -44,9 +46,9 @@ export function Register({ navigation }) {
       await createUser({ email, password })
       await updateUserName(name)
 
-      setIsLoading(false)
     } catch (err) {
       setErrorCreatingUser('Não foi possível criar usuário')
+    } finally {
       setIsLoading(false)
     }
   }

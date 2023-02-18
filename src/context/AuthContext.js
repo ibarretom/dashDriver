@@ -4,23 +4,16 @@ import {
   signInWithEmailAndPassword,
   onAuthStateChanged,
   createUserWithEmailAndPassword,
-  updateProfile
 } from "../plugins/firebase";
 
 export const AuthContext = createContext({});
 
 export function Auth({ children }) {
   const [user, setUser] = useState(null);
-  const [isLogIn, setIsLogIn] = useState(false);
+  const [isLoggedIn, setisLoggedIn] = useState(false);
 
-  function createUser({ email, password }) {
+  async function createUser({ email, password }) {
     return createUserWithEmailAndPassword(auth, email, password)
-  }
-
-  function updateUserName(name) {
-    return updateProfile(auth.currentUser, {
-      displayName: name
-    })
   }
 
   function signIn({ email, password }) {
@@ -31,17 +24,17 @@ export function Auth({ children }) {
     onAuthStateChanged(auth, (user) => {
       if (user) {
         setUser(user);
-        setIsLogIn(true);
+        setisLoggedIn(true);
 
       } else {
         setUser(null);
-        setIsLogIn(false);
+        setisLoggedIn(false);
       }
     });
   }, []);
 
   return (
-    <AuthContext.Provider value={{ createUser, signIn, updateUserName, isLogIn, user }}>
+    <AuthContext.Provider value={{ createUser, signIn, isLoggedIn, user }}>
       {children}
     </AuthContext.Provider>
   );

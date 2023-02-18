@@ -13,8 +13,11 @@ import { months } from "../utils/months"
 import { useRevenue } from "../hooks/revenue"
 import { useCarInfo } from "../hooks/carInfo"
 import { useNavigationState } from "@react-navigation/native";
+import { useAuth } from "../hooks/auth";
 
 export function Home({ navigation }) {
+  const { user } = useAuth()
+
   const { getRevenue, getTotalRevenue } = useRevenue()
   const { getCarInfo } = useCarInfo()
   const state = useNavigationState(state => state);
@@ -67,7 +70,7 @@ export function Home({ navigation }) {
         <View style={styles.welcomeContainer}>
           <Picture />
           <View style={styles.welcomeTextContainer}>
-            <Text style={styles.welcomeText}>Bem-vindo, Jonh Doe</Text>
+            <Text style={styles.welcomeText}>Bem-vindo, {user?.displayName}</Text>
             <Text>{`${new Date().getDate()} de ${months[new Date().getMonth()].label} de ${new Date().getFullYear()}`} </Text>
           </View>
         </View>
