@@ -6,9 +6,13 @@ import {
   createUserWithEmailAndPassword,
 } from "../plugins/firebase";
 
+import { useLoading } from "../hooks/loading";
+
 export const AuthContext = createContext({});
 
 export function Auth({ children }) {
+  const { setIsLoading } = useLoading()
+
   const [user, setUser] = useState(null);
   const [isLoggedIn, setisLoggedIn] = useState(false);
 
@@ -30,7 +34,8 @@ export function Auth({ children }) {
         setUser(null);
         setisLoggedIn(false);
       }
-    });
+      setIsLoading(false)
+    })
   }, []);
 
   return (

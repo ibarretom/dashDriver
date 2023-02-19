@@ -4,15 +4,18 @@ import { StyleSheet, SafeAreaView } from "react-native";
 import { Router } from "./src/router/Router";
 
 import { Auth } from "./src/context/AuthContext";
+import { Loading } from "./src/context/LoadingContext";
 
 export default function App() {
   return (
-    <Auth>
-      <SafeAreaView style={styles.container}>
-        <StatusBar style="auto" />
-        <Router />
-      </SafeAreaView>
-    </Auth>
+    <Loading>
+      <Auth>
+        <SafeAreaView style={styles.container}>
+          <StatusBar style="auto" />
+          <Router />
+        </SafeAreaView>
+      </Auth>
+    </Loading>
   );
 }
 
