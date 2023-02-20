@@ -7,6 +7,9 @@ import {
 } from "../plugins/firebase";
 
 import { useLoading } from "../hooks/loading";
+import * as SplashScreen from 'expo-splash-screen';
+
+SplashScreen.preventAutoHideAsync();
 
 export const AuthContext = createContext({});
 
@@ -34,6 +37,8 @@ export function Auth({ children }) {
         setUser(null);
         setisLoggedIn(false);
       }
+
+      SplashScreen.hideAsync()
       setIsLoading(false)
     })
   }, []);
