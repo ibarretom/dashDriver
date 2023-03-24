@@ -47,6 +47,10 @@ export function Auth({ children }) {
           setIsLoggedIn(true)
         }
 
+        if (user) {
+          setUser(user)
+        }
+
         SplashScreen.hideAsync()
         setIsLoading(false)
       })
