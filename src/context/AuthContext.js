@@ -3,6 +3,7 @@ import { createContext, useEffect, useState } from 'react'
 
 import auth from '../service/auth/auth.service'
 import Token from '../service/token.service'
+import { dashDriverInterceptor } from '../service/interceptors'
 
 import { useLoading } from '../hooks/loading'
 import * as SplashScreen from 'expo-splash-screen'
@@ -24,6 +25,8 @@ export function Auth({ children }) {
       throw new Error(err)
     }
   }
+
+  dashDriverInterceptor(setIsLoggedIn, user)
 
   async function signIn({ email, password }) {
     try {
