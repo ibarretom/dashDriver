@@ -1,53 +1,70 @@
-import { StyleSheet, View, Text, ScrollView, Alert, TouchableWithoutFeedback, Keyboard } from "react-native"
-import { useEffect, useState } from "react"
+import {
+  StyleSheet,
+  View,
+  Text,
+  ScrollView,
+  Alert,
+  TouchableWithoutFeedback,
+  Keyboard,
+} from 'react-native'
+import { useEffect, useState } from 'react'
 
-import { AppButton } from "../components/buttons/AppButton"
-import { BackButton } from "../components/buttons/BackButton"
-import { AppDatePicker } from "../components/inputs/AppDatePicker"
-import { AppTextInput } from "../components/inputs/AppTextInput"
+import { AppButton } from '../components/buttons/AppButton'
+import { BackButton } from '../components/buttons/BackButton'
+import { AppDatePicker } from '../components/inputs/AppDatePicker'
+import { AppTextInput } from '../components/inputs/AppTextInput'
 
-import { useForm, Controller } from "react-hook-form"
-import { yupResolver } from "@hookform/resolvers/yup";
-import * as yup from "yup"
+import { useForm, Controller } from 'react-hook-form'
+import { yupResolver } from '@hookform/resolvers/yup'
+import * as yup from 'yup'
 
-import { db, collection, addDoc } from "../plugins/firebase"
-import { useAuth } from "../hooks/auth"
-import { months } from "../utils/months"
+import carRide from '../service/carRide/carRide.service'
 
 const carRideSchema = yup.object({
   zipCode: yup
     .string()
-    .transform((value) => (isNaN(value) || value === null || value === undefined) ? 0 : value)
+    .transform((value) =>
+      isNaN(value) || value === null || value === undefined ? 0 : value
+    )
     .length(8, 'O CEP deve ter 8 dígitos')
     .required('Digite o cep'),
   amount: yup
     .number()
-    .transform((value) => (isNaN(value) || value === null || value === undefined) ? 0 : value)
+    .transform((value) =>
+      isNaN(value) || value === null || value === undefined ? 0 : value
+    )
     .positive('Este campo deve maior que zero')
     .required('Digite o valor'),
   date: yup.string().required('Digite a data'),
-  time: yup.string().required('Este campo deve ser preenchido')
+  time: yup.string().required('Este campo deve ser preenchido'),
 })
 
 export function CarRide({ navigation }) {
-  const { user } = useAuth()
-
   const [address, setAddress] = useState({
     street: '',
     neighborhood: '',
     city: '',
-    federated_unit: ''
+    federated_unit: '',
   })
+
   const [sendingData, setSendingData] = useState(false)
 
-  const { control, handleSubmit, watch, reset, formState: { errors, isSubmitSuccessful } } = useForm({
+  const {
+    control,
+    handleSubmit,
+    watch,
+    reset,
+    formState: { errors, isSubmitSuccessful },
+  } = useForm({
     defaultValues: {
       zipCode: '',
       amount: 0,
-      date: `${new Date().getDate()}/${new Date().getMonth() + 1}/${new Date().getFullYear()}`,
+      date: `${new Date().getDate()}/${
+        new Date().getMonth() + 1
+      }/${new Date().getFullYear()}`,
       time: `${new Date().getHours()}:${new Date().getMinutes()}`,
     },
-    resolver: yupResolver(carRideSchema)
+    resolver: yupResolver(carRideSchema),
   })
 
   const zipCode = watch('zipCode')
@@ -59,16 +76,16 @@ export function CarRide({ navigation }) {
   useEffect(() => {
     if (zipCode.length == 8) {
       fetch(`https://viacep.com.br/ws/${zipCode}/json/`)
-        .then(r => r.json())
-        .then(d => {
+        .then((r) => r.json())
+        .then((d) => {
           setAddress({
             street: d.logradouro,
             neighborhood: d.bairro,
             city: d.localidade,
-            federated_unit: d.uf
+            federated_unit: d.uf,
           })
         })
-        .catch(e => console.log(e))
+        .catch((e) => console.log(e))
     }
 
     if (zipCode != 8 && address != '') {
@@ -79,32 +96,39 @@ export function CarRide({ navigation }) {
   async function handleSubmitCarRide({ zipCode, amount, date, time }) {
     setSendingData(true)
 
+    const dateObject = {
+      day: parseInt(date.split('/')[0]),
+      month: parseInt(date.split('/')[1]) - 1, // menos 1 porque no javascript o mes começa de 0 e o date picker de 1
+      year: parseInt(date.split('/')[2]),
+      hour: parseInt(time.split(':')[0]),
+      minute: parseInt(time.split(':')),
+    }
+
     try {
-      await addDoc(collection(db, 'car_ride'), {
-        user_id: user.uid,
+      await carRide.create({
         amount,
         address: {
-          zip_code: zipCode,
-          ...address
+          zip_code: Number(zipCode),
+          ...address,
         },
-        date: {
-          month_name: months[date.split('/')[1] - 1].label, // menos 1 porque no javascript o mes começa de 0 e o date picker de 1
-          day: parseInt(date.split('/')[0]),
-          month: parseInt(date.split('/')[1]) - 1, // menos 1 porque no javascript o mes começa de 0 e o date picker de 1
-          year: parseInt(date.split('/')[2]),
-          hour: parseInt(time.split(':')[0]),
-          minute: parseInt(time.split(':')),
-          date_string: date,
-          time_string: time
-        },
+        iso_date: new Date(
+          dateObject.year,
+          dateObject.month,
+          dateObject.day,
+          dateObject.hour,
+          dateObject.minute
+        ).toISOString(),
       })
 
       Alert.alert('Corrida adicionada', 'A corrida foi adicionada com sucesso')
 
       setSendingData(false)
-
     } catch (e) {
-      Alert.alert('Erro ao adicionar corrida', 'Não foi possível adicionar a corrida')
+      console.log(e)
+      Alert.alert(
+        'Erro ao adicionar corrida',
+        'Não foi possível adicionar a corrida'
+      )
 
       setSendingData(false)
     }
@@ -137,10 +161,13 @@ export function CarRide({ navigation }) {
                 value={value}
                 error={errors.zipCode?.message}
               />
-
             )}
           />
-          {!!address && <Text style={styles.addressText}>{`${address.street} - ${address.neighborhood} - ${address.city} - ${address.federated_unit}`}</Text>}
+          {!!address && (
+            <Text
+              style={styles.addressText}
+            >{`${address.street} - ${address.neighborhood} - ${address.city} - ${address.federated_unit}`}</Text>
+          )}
 
           <Controller
             control={control}
@@ -156,7 +183,6 @@ export function CarRide({ navigation }) {
                 error={errors.amount?.message}
               />
             )}
-
           />
           <Controller
             control={control}
@@ -167,7 +193,13 @@ export function CarRide({ navigation }) {
                 value={value}
                 setValue={onChange}
                 error={errors.date?.message}
-                maximumDate={new Date(new Date().getFullYear(), new Date().getMonth(), new Date().getDate())}
+                maximumDate={
+                  new Date(
+                    new Date().getFullYear(),
+                    new Date().getMonth(),
+                    new Date().getDate()
+                  )
+                }
               />
             )}
           />
@@ -187,7 +219,6 @@ export function CarRide({ navigation }) {
             )}
           />
 
-
           <View style={{ marginTop: 18 }}>
             <AppButton
               title={'Inserir corrida'}
@@ -197,7 +228,11 @@ export function CarRide({ navigation }) {
             />
           </View>
           <View style={{ marginTop: 8 }}>
-            <AppButton title={'Cancelar'} color={'#D6561A'} onPress={navigateBack} />
+            <AppButton
+              title={'Cancelar'}
+              color={'#D6561A'}
+              onPress={navigateBack}
+            />
           </View>
 
           <View style={styles.emptySpace}></View>
@@ -210,18 +245,18 @@ export function CarRide({ navigation }) {
 const styles = StyleSheet.create({
   header: {
     flexDirection: 'row',
-    alignItems: 'center'
+    alignItems: 'center',
   },
   title: {
     fontSize: 20,
     fontWeight: '600',
-    marginLeft: 8
+    marginLeft: 8,
   },
   addressText: {
     fontWeight: '300',
-    marginBottom: 8
+    marginBottom: 8,
   },
   emptySpace: {
-    marginTop: 70
-  }
+    marginTop: 70,
+  },
 })
