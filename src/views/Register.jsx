@@ -1,52 +1,64 @@
-import { StyleSheet, View, Text, KeyboardAvoidingView, Platform, TouchableWithoutFeedback, Keyboard } from "react-native";
+import {
+  StyleSheet,
+  View,
+  Text,
+  KeyboardAvoidingView,
+  Platform,
+  TouchableWithoutFeedback,
+  Keyboard,
+} from 'react-native'
 
-import { AppTextInput } from "../components/inputs/AppTextInput";
-import { AppButton } from "../components/buttons/AppButton";
-import { BackButton } from "../components/buttons/BackButton";
+import { AppTextInput } from '../components/inputs/AppTextInput'
+import { AppButton } from '../components/buttons/AppButton'
+import { BackButton } from '../components/buttons/BackButton'
 
-import { useForm, Controller } from "react-hook-form"
-import { yupResolver } from '@hookform/resolvers/yup';
-import * as yup from "yup"
+import { useForm, Controller } from 'react-hook-form'
+import { yupResolver } from '@hookform/resolvers/yup'
+import * as yup from 'yup'
 
-import { useAuth } from "../hooks/auth"
-import { useState } from "react";
-import { useUser } from "../hooks/user"
+import { useAuth } from '../hooks/auth'
+import { useState } from 'react'
 
 const registerSchema = yup.object({
   name: yup.string().required('Digite o nome'),
   email: yup.string().email('Email inválido').required('Digite o email'),
-  password: yup.string().min(6, 'Senha com no mínimo 6 caracteres').required('Digite a senha'),
+  password: yup
+    .string()
+    .min(6, 'Senha com no mínimo 6 caracteres')
+    .required('Digite a senha'),
   password_confirmation: yup
     .string()
     .required('Digite a confirmação de senha')
-    .oneOf([yup.ref('password'), null], 'As senhas devem coincindir')
+    .oneOf([yup.ref('password'), null], 'As senhas devem coincidir'),
 })
 
 export function Register({ navigation }) {
-  const { updateUserName } = useUser()
-  const { createUser } = useAuth()
+  const { signUp, signIn } = useAuth()
 
   const [isLoading, setIsLoading] = useState()
   const [errorCreatingUser, setErrorCreatingUser] = useState()
 
-  const { control, handleSubmit, formState: { errors } } = useForm({
+  const {
+    control,
+    handleSubmit,
+    formState: { errors },
+  } = useForm({
     defaultValues: {
       name: '',
       email: '',
       password: '',
-      password_confirmation: ''
+      password_confirmation: '',
     },
-    resolver: yupResolver(registerSchema)
+    resolver: yupResolver(registerSchema),
   })
-
 
   async function handleRegister({ name, email, password }) {
     setIsLoading(true)
     try {
-      await createUser({ email, password })
-      await updateUserName(name)
-
+      await signUp({ name, email, password })
+      await signIn({ email, password })
     } catch (err) {
+      console.log(err)
       setErrorCreatingUser('Não foi possível criar usuário')
     } finally {
       setIsLoading(false)
@@ -59,7 +71,10 @@ export function Register({ navigation }) {
 
   return (
     <TouchableWithoutFeedback onPress={Keyboard.dismiss}>
-      <KeyboardAvoidingView style={styles.mainContainer} behavior={Platform.OS === 'ios' ? 'padding' : 'height'}>
+      <KeyboardAvoidingView
+        style={styles.mainContainer}
+        behavior={Platform.OS === 'ios' ? 'padding' : 'height'}
+      >
         <View style={styles.header}>
           <BackButton onPress={navigateBack} />
           <Text style={styles.title}>Registrar-se</Text>
@@ -67,7 +82,7 @@ export function Register({ navigation }) {
 
         <Controller
           control={control}
-          name='name'
+          name="name"
           render={({ field: { onChange } }) => (
             <AppTextInput
               label={'Nome'}
@@ -80,7 +95,7 @@ export function Register({ navigation }) {
 
         <Controller
           control={control}
-          name='email'
+          name="email"
           render={({ field: { onChange } }) => (
             <AppTextInput
               label={'Email'}
@@ -93,7 +108,7 @@ export function Register({ navigation }) {
 
         <Controller
           control={control}
-          name='password'
+          name="password"
           render={({ field: { onChange } }) => (
             <AppTextInput
               label={'Senha'}
@@ -128,7 +143,9 @@ export function Register({ navigation }) {
           />
         </View>
 
-        {!!errorCreatingUser && <Text style={styles.errorMessage}>{errorCreatingUser}</Text>}
+        {!!errorCreatingUser && (
+          <Text style={styles.errorMessage}>{errorCreatingUser}</Text>
+        )}
       </KeyboardAvoidingView>
     </TouchableWithoutFeedback>
   )
@@ -137,7 +154,7 @@ export function Register({ navigation }) {
 const styles = StyleSheet.create({
   header: {
     flexDirection: 'row',
-    alignItems: 'center'
+    alignItems: 'center',
   },
   mainContainer: {
     flex: 1,
@@ -145,13 +162,13 @@ const styles = StyleSheet.create({
   title: {
     fontSize: 24,
     fontWeight: '700',
-    marginLeft: 8
+    marginLeft: 8,
   },
   errorMessage: {
     marginTop: 16,
     fontSize: 18,
     fontWeight: '600',
     textAlign: 'center',
-    color: 'red'
-  }
+    color: 'red',
+  },
 })

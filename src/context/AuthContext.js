@@ -1,51 +1,61 @@
-import { createContext, useEffect, useState } from "react";
-import {
-  auth,
-  signInWithEmailAndPassword,
-  onAuthStateChanged,
-  createUserWithEmailAndPassword,
-} from "../plugins/firebase";
+import AsyncStorage from '@react-native-async-storage/async-storage'
+import { createContext, useEffect, useState } from 'react'
 
-import { useLoading } from "../hooks/loading";
-import * as SplashScreen from 'expo-splash-screen';
+import auth from '../service/auth/auth.service'
+import Token from '../service/token.service'
 
-SplashScreen.preventAutoHideAsync();
+import { useLoading } from '../hooks/loading'
+import * as SplashScreen from 'expo-splash-screen'
 
-export const AuthContext = createContext({});
+SplashScreen.preventAutoHideAsync()
+
+export const AuthContext = createContext({})
 
 export function Auth({ children }) {
   const { setIsLoading } = useLoading()
 
-  const [user, setUser] = useState(null);
-  const [isLoggedIn, setisLoggedIn] = useState(false);
+  const [user, setUser] = useState(null)
+  const [isLoggedIn, setIsLoggedIn] = useState(false)
 
-  async function createUser({ email, password }) {
-    return createUserWithEmailAndPassword(auth, email, password)
+  async function signUp({ name, email, password }) {
+    try {
+      await auth.SignUp({ name, email, password })
+    } catch (err) {
+      throw new Error(err)
+    }
   }
 
-  function signIn({ email, password }) {
-    return signInWithEmailAndPassword(auth, email, password)
+  async function signIn({ email, password }) {
+    try {
+      const user = await auth.SignIn({ email, password })
+
+      await AsyncStorage.setItem('user', JSON.stringify(user))
+
+      setUser(user)
+      setIsLoggedIn(true)
+    } catch (err) {
+      throw new Error(err)
+    }
   }
 
   useEffect(() => {
-    onAuthStateChanged(auth, (user) => {
-      if (user) {
-        setUser(user);
-        setisLoggedIn(true);
+    AsyncStorage.getItem('user')
+      .then((value) => {
+        const user = JSON.parse(value)
 
-      } else {
-        setUser(null);
-        setisLoggedIn(false);
-      }
+        if (Token.isValid(user?.token)) {
+          setIsLoggedIn(true)
+        }
 
-      SplashScreen.hideAsync()
-      setIsLoading(false)
-    })
-  }, []);
+        SplashScreen.hideAsync()
+        setIsLoading(false)
+      })
+      .catch((err) => console.log(err))
+  }, [])
 
   return (
-    <AuthContext.Provider value={{ createUser, signIn, isLoggedIn, user }}>
+    <AuthContext.Provider value={{ signUp, signIn, isLoggedIn, user }}>
       {children}
     </AuthContext.Provider>
-  );
+  )
 }
